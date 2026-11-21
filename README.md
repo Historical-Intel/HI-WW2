@@ -93,3 +93,15 @@ both requested and actual ratios. With five unevenly sized books, exact ratios
 may be impossible. Use `--train`, `--validation`, and `--test` for other ratios.
 To shuffle the resulting dataset, pass its private directory to
 `scripts/shuffle_chunks.py --input`.
+
+## Private tokenization, step 1
+
+Run `python3 scripts/tokenize_text.py` to convert the latest shuffled chunks
+into numeric UTF-8 byte IDs. This reversible baseline is useful for inspecting
+the conversion, but it is not compatible with a pretrained model's vocabulary.
+For fine-tuning, rerun with `--tokenizer-path` pointing to a **local** directory
+containing the exact target model's Hugging Face tokenizer. That mode requires
+the optional `transformers` package and never downloads tokenizer files.
+Each private `tokenized-*` run contains numeric JSONL files, a manifest, and
+`report.md` with counts, ID lengths, and a small numeric sample. The script
+does not pad or truncate chunks; batching is a separate step.
