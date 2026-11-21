@@ -105,3 +105,14 @@ the optional `transformers` package and never downloads tokenizer files.
 Each private `tokenized-*` run contains numeric JSONL files, a manifest, and
 `report.md` with counts, ID lengths, and a small numeric sample. The script
 does not pad or truncate chunks; batching is a separate step.
+
+## Private tokenization, step 2
+
+Run `python3 scripts/batch_sequences.py` to divide numeric IDs into sequences
+of 512 IDs and group up to eight sequences per batch. Each private batch row
+contains `input_ids`, `attention_mask`, causal-language-model `labels`, and
+source metadata. Short sequences are padded; padding labels are `-100` so a
+standard training loss can ignore them. The script keeps each chunk within its
+original book and split. A private `report.md` shows sequence, batch, and
+padding counts. Set `--sequence-length`, `--batch-size`, or `--pad-id` as needed
+for a chosen model. Byte-tokenized data remains an inspection baseline.
