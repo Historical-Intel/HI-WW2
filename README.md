@@ -43,5 +43,16 @@ comparison. PDF metadata is a starting point for author and copyright research;
 it does not establish permission. Rights and author attribution require review
 before training or redistribution. Outputs remain marked as pending review.
 
-The source PDFs were previously committed to Git. Ignoring cleaned output does
-not make those existing source files private or remove them from Git history.
+## Private research materials
+
+Research source files and extracted text are stored locally under `.env/` and
+`data/private/`. These directories are excluded from Git. Do not commit source
+files, extracted text, source identities, rights notes, or model artifacts that
+reproduce source passages. The collection includes World War I background for
+studying the lead-up to World War II.
+
+Rights research uses `python3 scripts/research_rights.py` and a private JSON
+mapping of local book IDs to publisher or rights-holder URLs at
+`data/private/rights_sources.json`. Results stay under `data/private/`. Web pages
+may provide leads but do not themselves establish permission for model training.
+Keep any permission records local and review the applicable terms before use.
