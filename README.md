@@ -56,3 +56,40 @@ mapping of local book IDs to publisher or rights-holder URLs at
 `data/private/rights_sources.json`. Results stay under `data/private/`. Web pages
 may provide leads but do not themselves establish permission for model training.
 Keep any permission records local and review the applicable terms before use.
+
+## Private text segmentation
+
+After extraction, put reviewed one-based PDF page ranges in the ignored
+`data/private/segmentation_review.json`. Each key is an exact local PDF filename;
+each entry has a `title`, `core_pages` as inclusive `[start, end]` pairs, and
+optional `chapters` with `name`, `start`, and `end` page fields. Inspect the page
+ranges before relying on them: a page with both endnotes and narrative cannot be
+separated accurately using page ranges alone.
+
+Run `python3 scripts/segment_text.py` to create fixed windows of 512 whitespace
+tokens with 64 tokens of overlap. `--window` and `--overlap` change those values.
+Whitespace tokens are only a local approximation; a model's tokenizer will count
+tokens differently. The private output contains one JSONL file for each of train,
+validation, and test, plus a manifest. Each chunk records its local source,
+title, optional chapter, index, and source page span. Splits are assigned by
+whole book to keep adjacent windows together. Identical windows are removed.
+The output remains under `data/private/` and is marked as pending rights review.
+
+The current pipeline handles text. Page images and layout regions would need a
+separate vision workflow if the project later trains on visual PDF content.
+
+Run `python3 scripts/shuffle_chunks.py` after segmentation to shuffle chunks
+independently within train, validation, and test. The default seed is 42; pass
+`--seed` to reproduce another ordering. The new private `shuffled-*` directory
+contains the three JSONL files and a manifest with the seed, counts, and input
+and output checksums. Original `chunk_index` and page references are preserved;
+`shuffle_index` records each row's new position. Book-level split assignments
+do not change.
+
+Run `python3 scripts/split_chunks.py` to make the split an explicit step. It
+groups chunks by whole book and chooses assignments closest to 70% train,
+20% validation, and 10% test by chunk count. The private manifest records
+both requested and actual ratios. With five unevenly sized books, exact ratios
+may be impossible. Use `--train`, `--validation`, and `--test` for other ratios.
+To shuffle the resulting dataset, pass its private directory to
+`scripts/shuffle_chunks.py --input`.
