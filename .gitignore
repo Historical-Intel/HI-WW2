@@ -150,6 +150,8 @@ activemq-data/
 *.sage.py
 
 # Environments
+# Local research text, extraction reports, and rights-review notes
+/data/private/
 .env
 .envrc
 .venv
